@@ -1,0 +1,29 @@
+---
+title: "Midterm"
+author: "Megan Tran"
+date: 'October 18, 2022'
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r install-libraries}
+library(lubridate)
+library(tidyverse)
+library(data.table)
+library(ggplot2)
+library(dtplyr)
+library(dplyr)
+```
+
+```{r read-data, cache=TRUE}
+if (!file.exists("cscpopendata.csv")) {
+download.file("https://data.chhs.ca.gov/dataset/596b5eed-31de-4fd8-a645-249f3f9b19c4/resource/57da6c9a-41a7-44b0-ab8d-815ff2cd5913/download/cscpopendata.csv", "cscpopendata.csv", method="libcurl", timeout = 60) 
+}
+cosm <- data.table::fread("cscpopendata.csv") 
+```
+
+
