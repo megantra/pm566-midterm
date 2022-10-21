@@ -1,7 +1,7 @@
 ---
-title: "Midterm"
+title: "Midterm Project"
 author: "Megan Tran"
-date: 'October 18, 2022'
+date: 'October 23, 2022'
 output: github_document
 always_allow_html: true
 ---
@@ -19,11 +19,182 @@ library(dtplyr)
 library(dplyr)
 ```
 
+
+```{r read-data, cache=TRUE}
+if (!file.exists("ofp-ccw-by-race-ethn_contra-type_age-group_14-16.csv")) {
+download.file("https://data.chhs.ca.gov/dataset/c2698502-d276-4e55-9057-8153e39d21b1/resource/12a73f54-dcf4-4e38-843c-e988385be69b/download/ofp-ccw-by-race-ethn_contra-type_age-group_14-16.csv", "ofp-ccw-by-race-ethn_contra-type_age-group_14-16.csv", method="libcurl", timeout = 60) 
+}
+contra <- data.table::fread("ofp-ccw-by-race-ethn_contra-type_age-group_14-16.csv") 
+```
+
+
+##Introduction 
+(provide background on your dataset and formulated question)
+
+
+The dataset was compiled for the Measure CCW, Contraceptive Care as part of the Maternal and Infant Health Initiative, Contraceptive Care Quality grant. 
+
+
+Question: Are older women (age 21-44) more likely to use Long-Acting Reversible Contraceptives than younger women (age 15-20) and is the trend consistent across all races?
+
+
+
+
+##Methods 
+(include how and where the data were acquired, how you cleaned and wrangled the data, what tools you used for data exploration)
+
+
+
+```{r}
+mean(is.na(contra))
+```
+
+
+
+```{r}
+contra <- gsub('%','','Rate of Contraceptive Use')
+```
+
+
+
+```{r}
+contra$rate <- as.numeric(contra$rate)
+```
+
+
+
+
+```{r}
+str(contra)
+```
+
+
+```{r}
+contra[, .(
+  avg_rate = mean(rate)
+  )]
+```
+
+```{r}
+str(contra)
+```
+
+
+
+
+##Preliminary Results 
+(provide summary statistics in tabular form and publication-quality figures, take a look at the kable function from knitr to write nice tables in Rmarkdown)
+
+
+
+
+##Conclusion about what you found in terms of the formulated question.
+
+
+
+
+
+
 ```{r read-data, cache=TRUE}
 if (!file.exists("cscpopendata.csv")) {
 download.file("https://data.chhs.ca.gov/dataset/596b5eed-31de-4fd8-a645-249f3f9b19c4/resource/57da6c9a-41a7-44b0-ab8d-815ff2cd5913/download/cscpopendata.csv", "cscpopendata.csv", method="libcurl", timeout = 60) 
 }
 cosm <- data.table::fread("cscpopendata.csv") 
 ```
+
+
+
+```{r}
+cosm_subset <- subset(cosm, PrimaryCategory=="Skin Care Products ")
+```
+
+
+```{r}
+length(unique(cosm_subset$BrandName))
+length(unique(cosm_subset$CompanyName))
+```
+```{r}
+head(unique(cosm_subset$CompanyName))
+```
+
+```{r}
+cosm_subset_2 <- subset(cosm_subset, CompanyName=="Philosophy" | CompanyName=="Physician's Care Alliance, LLC" | CompanyName=="New Avon LLC" | CompanyName=="Sunrider Manufacturing, L.P." | CompanyName=="Romane Fragrances")
+```
+
+
+
+##Introduction 
+(provide background on your dataset and formulated question)
+
+Question: Have the number of cosmetic products with potentially toxic ingredients been decreasing? Which types of products are safest to use, or least likely to have toxins?
+
+a cross sectional survey of chemical composition of cosmetic products in California
+
+bar graph x axis is chemical count 2009 and 2020
+x axis is category y axis is count
+
+
+subset data: Out of the top skincare beauty brands, which brand has the least number of average chemicals in their products and would be safest to use on your skin?
+
+Drunk Elephant
+The Ordinary
+Tatcha
+Sunday Riley
+OleHenriksen
+Estee Lauder
+
+##Methods 
+(include how and where the data were acquired, how you cleaned and wrangled the data, what tools you used for data exploration)
+
+The California Safe Cosmetics Program in the California Department of Public Health collects information on hazardous ingredients in cosmetic products sold in the state and makes the data accessible to consumers.
+
+
+```{r}
+mean(is.na(cosm_subset_2))
+```
+
+```{r}
+avg_ChemicalCount <- aggregate(cosm_subset_2$ChemicalCount, list(cosm_subset_2$CompanyName), FUN=mean)
+```
+
+```{r}
+ggplot(data=avg_ChemicalCount, aes(x = Group.1, y = x)) + 
+  geom_bar(stat="identity")+
+  labs(x="Company Name" , y="Mean Chemical Count")
+```
+
+
+
+##Preliminary Results 
+(provide summary statistics in tabular form and publication-quality figures, take a look at the kable function from knitr to write nice tables in Rmarkdown)
+
+
+
+
+##Conclusion about what you found in terms of the formulated question.
+
+
+
+
+##Different dataset
+
+```{r read-data, cache=TRUE}
+if (!file.exists("d5tf-ez2w.csv")) {
+download.file("https://data.lacity.org/resource/d5tf-ez2w.csv", "d5tf-ez2w.csv", method="libcurl", timeout = 60) 
+}
+traf_col <- data.table::fread("d5tf-ez2w.csv") 
+```
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
 
 
