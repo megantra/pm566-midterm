@@ -59,6 +59,7 @@ library(data.table)
 library(ggplot2)
 library(dtplyr)
 library(dplyr)
+library(stringr)
 ```
 
 ``` r
@@ -71,16 +72,34 @@ contra <- data.table::fread("ofp-ccw-by-race-ethn_contra-type_age-group_14-16.cs
 \##Introduction (provide background on your dataset and formulated
 question)
 
-The dataset was compiled for the Measure CCW, Contraceptive Care as part
-of the Maternal and Infant Health Initiative, Contraceptive Care Quality
-grant.
+The Contraceptive Care - All Women measure (CCW), as part of the
+Maternal and Infant Health Initiative, Contraceptive Care Quality grant,
+was compiled data from all women ages 15-44 at risk for unintended
+pregnancy. The women were stratified in two age groups, those who are
+15-20 and those who are 21-44. These women were either receiving
+long-acting reversible methods of contraception (LARC) or
+most/moderately effective methods of contraceptions (M/M), like female
+sterilization, contraceptive implants, IUDs, oral pills, patches, rings,
+injectables, or diaphragms. Data was gathered for 3 consecutive years,
+2014-2016, in California.
 
-Question: Are older women (age 21-44) more likely to use Long-Acting
-Reversible Contraceptives than younger women (age 15-20) and is the
-trend consistent across all races?
+The research question being explore is if younger women (age 15-20) are
+more likely to use most/moderately effective methods of contraceptions
+(\</M) than older women (age 21-44) and is the trend consistent the
+three year period?
 
 \##Methods (include how and where the data were acquired, how you
 cleaned and wrangled the data, what tools you used for data exploration)
+
+The data was collected through administrative survey measures. The
+representative sample excluded women not at risk of unintended pregnancy
+because they were infecund for non-contraceptive reasons, had a live
+birth in the last 2 months of the measurement year, or were pregnant or
+their pregnancy outcome was unknown at the end of the year(s). Once the
+exclusions were applied, the sample included women who were not pregnant
+at any point in the 3-year period, those who had a live birth in the
+first 10 months of the measurement year(s), and those who had a
+miscarriage, stillbirth, ectopic pregnancy, or induced abortion.
 
 ``` r
 mean(is.na(contra))
@@ -102,8 +121,59 @@ str(contra)
     ##  $ Rate of Contraceptive Use: chr  "46.92%" "44.59%" "41.98%" "29.86%" ...
     ##  - attr(*, ".internal.selfref")=<externalptr>
 
+``` r
+contra$`Rate of Contraceptive Use` <- stringr::str_remove_all(contra$`Rate of Contraceptive Use`, "%")
+```
+
+``` r
+contra$`Rate of Contraceptive Use` <- as.numeric(contra$`Rate of Contraceptive Use`)
+```
+
+``` r
+avg_contra <- contra[ , .(
+    avg_rate = mean (`Rate of Contraceptive Use`)
+  ), 
+  by = .(`Contraceptive Type`, `Age Group`, Year)]
+```
+
 \##Preliminary Results (provide summary statistics in tabular form and
 publication-quality figures, take a look at the kable function from
 knitr to write nice tables in Rmarkdown)
+
+``` r
+contra[!is.na(`Rate of Contraceptive Use`)] %>% 
+  ggplot()+
+  geom_boxplot(mapping=aes(x=`Contraceptive Type`, y= `Rate of Contraceptive Use`, fill = `Contraceptive Type`)) +
+    facet_wrap(Year ~ `Age Group`, nrow=3)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+database <- data.frame(
+    Year = avg_contra$Year, 
+   Contraceptive_Type = avg_contra$`Contraceptive Type`,
+    Age_Group = avg_contra$`Age Group`,
+   Average_Rate_of_Contraceptive_Use = avg_contra$avg_rate
+ )
+ knitr::kable(database, caption = "Contraceptive Use of Women 2014-2016")
+```
+
+| Year | Contraceptive_Type        | Age_Group       | Average_Rate_of_Contraceptive_Use |
+|-----:|:--------------------------|:----------------|----------------------------------:|
+| 2014 | Most/Moderately Effective | 15-20 year olds |                         38.765000 |
+| 2014 | LARC                      | 15-20 year olds |                          8.635000 |
+| 2014 | Most/Moderately Effective | 21-44 year olds |                         42.683333 |
+| 2014 | LARC                      | 21-44 year olds |                          8.290000 |
+| 2015 | LARC                      | 21-44 year olds |                          6.785714 |
+| 2015 | Most/Moderately Effective | 15-20 year olds |                         32.613333 |
+| 2015 | LARC                      | 15-20 year olds |                          5.605000 |
+| 2015 | Most/Moderately Effective | 21-44 year olds |                         31.471667 |
+| 2016 | Most/Moderately Effective | 15-20 year olds |                         31.408333 |
+| 2016 | LARC                      | 15-20 year olds |                          5.156667 |
+| 2016 | Most/Moderately Effective | 21-44 year olds |                         30.286667 |
+| 2016 | LARC                      | 21-44 year olds |                          6.576667 |
+
+Contraceptive Use of Women 2014-2016
 
 \##Conclusion about what you found in terms of the formulated question.
