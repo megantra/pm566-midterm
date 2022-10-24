@@ -66,7 +66,7 @@ library(stringr)
 
 The Contraceptive Care - All Women measure (CCW), as part of the
 Maternal and Infant Health Initiative, Contraceptive Care Quality grant,
-was compiled data from all women ages 15-44 at risk for unintended
+was compiled data taken from women ages 15-44 at risk for unintended
 pregnancy. The women were stratified in two age groups, those who are
 15-20 and those who are 21-44. Contraceptive type either fell under the
 category of long-acting reversible methods of contraception (LARC), such
@@ -89,12 +89,11 @@ available contraceptive methods may not be able to make an informed
 decision on the contraception that’s right for them.
 
 The research question being explored is if younger women (age 15-20) use
-long-acting reversible methods of contraception (LARC) less than older
-women (age 21-44) and is that trend consistent throughout the three year
-period?
+long-acting reversible methods of contraception (LARC) at a lower rate
+than older women (age 21-44) and is that trend consistent throughout the
+three year period?
 
-\#Methods (include how and where the data were acquired, how you cleaned
-and wrangled the data, what tools you used for data exploration)
+\#Methods
 
 The data was collected through administrative survey measures. The
 representative sample excluded U.S. women not at risk of unintended
@@ -116,15 +115,16 @@ download.file("https://data.chhs.ca.gov/dataset/c2698502-d276-4e55-9057-8153e39d
 contra <- data.table::fread("ofp-ccw-by-race-ethn_contra-type_age-group_14-16.csv") 
 ```
 
-First, the number of missing values were checked. There were no missing
-values in the dataset so there was no need to remove observations or
-impute data.
+First, the number of missing values were checked.
 
 ``` r
 mean(is.na(contra))
 ```
 
     ## [1] 0
+
+There were no missing values in the dataset so there was no need to
+remove observations or impute data.
 
 A regular expression was used in order to remove the “%” symbol from the
 “Rate of Contraceptive Use” column.
@@ -225,9 +225,9 @@ confirm that the median LARC contraceptive use rates for younger women
 are only higher than for older women only in 2014. The opposite is true
 for the next two years. There seems to be an outlier for LARC
 contraceptive types in 2015 for 21-44 year olds. By examining the data
-more closely, we can see that the outlier is not concerning because it
-comes from the “Other Asian/Pacific Islander” racial group and they
-consistently have higher rates throughout the dataset.
+more closely, we can see that the outlier is not particularly concerning
+because it comes from the “Other Asian/Pacific Islander” racial group
+and they consistently have higher rates throughout the dataset.
 
 ``` r
 database <- data.frame(
